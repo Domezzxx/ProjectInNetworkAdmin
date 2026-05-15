@@ -1,6 +1,5 @@
 
-                        <!DOCTYPE html>
-                        <html lang="en">
+
                         <head>
                             <meta charset="UTF-8">
                             <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -740,7 +739,7 @@
             transform-origin: center;
             transition: transform 0.2s;
             user-select: none;
-            pointer-events: none;
+            touch-action: none;
         }
 
         /* ─── BUTTONS ─── */
@@ -1408,12 +1407,14 @@ function updateImageTransform() {
     img.style.transform = `translate(${mapTranslateX}px, ${mapTranslateY}px) scale(${mapScale})`;
 }
 
+var activePointerId = null;
+
 function getPanLimits() {
     const shell = document.getElementById('mapZoomShell');
     const img = document.getElementById('mapImage');
     const shellRect = shell.getBoundingClientRect();
-    const imgWidth = img.width * mapScale;
-    const imgHeight = img.height * mapScale;
+    const imgWidth = img.clientWidth * mapScale;
+    const imgHeight = img.clientHeight * mapScale;
     const maxX = Math.max(0, (imgWidth - shellRect.width) / 2);
     const maxY = Math.max(0, (imgHeight - shellRect.height) / 2);
     return { maxX, maxY };
@@ -1446,17 +1447,20 @@ function zoomOut() {
 function onMapPointerDown(event) {
     if (mapScale <= 1) return;
     event.preventDefault();
-    event.stopPropagation();
     isDragging = true;
+    activePointerId = event.pointerId;
     dragStartX = event.clientX;
     dragStartY = event.clientY;
     startTranslateX = mapTranslateX;
     startTranslateY = mapTranslateY;
+    if (event.currentTarget && event.currentTarget.setPointerCapture) {
+        event.currentTarget.setPointerCapture(activePointerId);
+    }
     document.body.style.cursor = 'grabbing';
 }
 
 function onMapPointerMove(event) {
-    if (!isDragging) return;
+    if (!isDragging || event.pointerId !== activePointerId) return;
     event.preventDefault();
     const deltaX = event.clientX - dragStartX;
     const deltaY = event.clientY - dragStartY;
@@ -1466,9 +1470,13 @@ function onMapPointerMove(event) {
     updateImageTransform();
 }
 
-function onMapPointerUp() {
-    if (!isDragging) return;
+function onMapPointerUp(event) {
+    if (!isDragging || (event && event.pointerId !== activePointerId)) return;
     isDragging = false;
+    activePointerId = null;
+    if (event && event.currentTarget && event.currentTarget.releasePointerCapture) {
+        event.currentTarget.releasePointerCapture(event.pointerId);
+    }
     document.body.style.cursor = '';
 }
 
@@ -1481,10 +1489,14 @@ function onMapWheel(event) {
 function initMapInteractions() {
     const shell = document.getElementById('mapZoomShell');
     if (!shell) return;
-    shell.addEventListener('mousedown', onMapPointerDown);
+    shell.addEventListener('pointerdown', onMapPointerDown);
+    shell.addEventListener('pointermove', onMapPointerMove);
+    shell.addEventListener('pointerup', onMapPointerUp);
+    shell.addEventListener('pointerleave', onMapPointerUp);
+    shell.addEventListener('pointercancel', onMapPointerUp);
     shell.addEventListener('wheel', onMapWheel, { passive: false });
-    document.addEventListener('mousemove', onMapPointerMove);
-    document.addEventListener('mouseup', onMapPointerUp);
+    document.addEventListener('pointermove', onMapPointerMove);
+    document.addEventListener('pointerup', onMapPointerUp);
 }
 
 function closeModal(id) {
@@ -1520,9 +1532,4 @@ document.addEventListener('DOMContentLoaded', () => {
 </body>
 </html>
 
-							<script>
-                            	
-							</script>
-                        </body>
-                        </html>
                     
