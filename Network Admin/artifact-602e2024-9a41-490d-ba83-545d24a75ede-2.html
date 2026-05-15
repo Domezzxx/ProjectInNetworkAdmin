@@ -1,0 +1,1384 @@
+
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+							<style>
+								body {
+									background-color: white; /* Ensure the iframe has a white background */
+								}
+
+								
+							</style>
+                        </head>
+                        <body>
+                            <!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Infrastructure Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #111827;
+            --bg-card: #1f2937;
+            --bg-deep: #0d1117;
+            --border: #1f2937;
+            --border-light: #374151;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --accent: #3d5af1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* ─── HEADER ─── */
+        .header {
+            background: linear-gradient(135deg, #0d1117 0%, #1a1f3a 50%, #0d1117 100%);
+            border-bottom: 2px solid var(--accent);
+            padding: 0 32px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 30px rgba(61,90,241,0.25);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .header-logo {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #3d5af1, #7c3aed);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+
+        .header-title h1 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.2;
+        }
+
+        .header-title p {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(0,255,136,0.1);
+            border: 1px solid rgba(0,255,136,0.3);
+            padding: 6px 14px;
+            border-radius: 20px;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: #00ff88;
+            border-radius: 50%;
+            animation: livePulse 1.5s infinite;
+        }
+
+        @keyframes livePulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.8); }
+        }
+
+        .live-text {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #00ff88;
+        }
+
+        .header-time {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-family: monospace;
+            background: var(--bg-deep);
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+        }
+
+        /* ─── STATS BAR ─── */
+        .stats-bar {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 32px;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+        }
+
+        .stat-card {
+            background: var(--bg-deep);
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            padding: 10px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+            transition: border-color 0.3s;
+        }
+
+        .stat-card:hover { border-color: var(--accent); }
+
+        .stat-icon { font-size: 1.4rem; }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* ─── MAIN LAYOUT ─── */
+        .layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            min-height: calc(100vh - 120px);
+        }
+
+        /* ─── SIDEBAR ─── */
+        .sidebar {
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            padding: 20px 14px;
+            overflow-y: auto;
+            position: sticky;
+            top: 70px;
+            height: calc(100vh - 120px);
+        }
+
+        .sidebar-section-title {
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding: 0 8px;
+            margin-bottom: 10px;
+        }
+
+        .vlan-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 10px;
+            border-radius: 9px;
+            cursor: pointer;
+            margin-bottom: 4px;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .vlan-nav-item:hover { background: var(--bg-card); }
+
+        .vlan-nav-item.active {
+            background: rgba(61,90,241,0.15);
+            border-color: rgba(61,90,241,0.4);
+        }
+
+        .vlan-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .vlan-nav-label { flex: 1; }
+
+        .vlan-nav-name {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+
+        .vlan-nav-id {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            font-family: monospace;
+        }
+
+        .vlan-nav-count {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 8px;
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 14px 0;
+        }
+
+        /* ─── CONTENT ─── */
+        .content { padding: 24px; overflow-y: auto; }
+
+        /* ─── TAB BAR ─── */
+        .tab-bar {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 5px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+            width: fit-content;
+        }
+
+        .tab-btn {
+            padding: 9px 28px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.88rem;
+            font-weight: 600;
+            transition: all 0.25s;
+            background: transparent;
+            color: var(--text-muted);
+        }
+
+        .tab-btn.active {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(61,90,241,0.4);
+        }
+
+        .tab-btn:hover:not(.active) {
+            color: var(--text-primary);
+            background: var(--bg-card);
+        }
+
+        /* ─── TAB PANELS ─── */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* ─── SECTION HEADER ─── */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ─── OVERVIEW METRICS ─── */
+        .overview-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            background: var(--bg-secondary);
+            border-radius: 14px;
+            padding: 18px;
+            border: 1px solid var(--border);
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--border-light);
+        }
+
+        .metric-icon { font-size: 2rem; margin-bottom: 8px; }
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+        .metric-label { font-size: 0.75rem; color: var(--text-muted); }
+
+        /* ─── MAP CONTAINER ─── */
+        .map-container {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .map-img-wrapper {
+            background: var(--bg-deep);
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+            position: relative;
+            min-height: 460px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: zoom-in;
+        }
+
+        .map-img-wrapper img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.3s;
+        }
+
+        .map-img-wrapper:hover img { transform: scale(1.01); }
+
+        .map-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-muted);
+            padding: 40px;
+            text-align: center;
+        }
+
+        .map-controls {
+            position: absolute;
+            bottom: 14px;
+            right: 14px;
+            display: flex;
+            gap: 6px;
+        }
+
+        .map-ctrl-btn {
+            background: rgba(17,24,39,0.9);
+            border: 1px solid var(--border-light);
+            color: var(--text-primary);
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            backdrop-filter: blur(4px);
+        }
+
+        .map-ctrl-btn:hover { background: var(--bg-card); }
+
+        /* ─── QUICK VLAN LIST (Overview) ─── */
+        .quick-vlan-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+            gap: 10px;
+        }
+
+        .quick-vlan-row {
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-left: 4px solid;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-vlan-row:hover {
+            transform: translateX(4px);
+            border-right-color: var(--border-light);
+        }
+
+        /* ─── VLAN GRID (VLAN Details Tab) ─── */
+        .search-bar {
+            width: 100%;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-light);
+            color: var(--text-primary);
+            padding: 11px 16px;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            outline: none;
+            transition: border-color 0.2s;
+            margin-bottom: 20px;
+        }
+
+        .search-bar:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(61,90,241,0.15);
+        }
+
+        .vlan-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        .vlan-card {
+            background: var(--bg-secondary);
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .vlan-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+            border-color: var(--border-light);
+        }
+
+        .vlan-card-top-bar { height: 4px; }
+
+        .vlan-card-body { padding: 18px; }
+
+        .vlan-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            font-family: monospace;
+            margin-bottom: 14px;
+        }
+
+        .vlan-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .vlan-emoji-box {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            flex-shrink: 0;
+        }
+
+        .vlan-info h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 3px;
+        }
+
+        .vlan-info p {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-family: monospace;
+        }
+
+        .vlan-stats-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .vlan-stat-box {
+            background: var(--bg-deep);
+            border-radius: 8px;
+            padding: 10px 8px;
+            text-align: center;
+        }
+
+        .vlan-stat-val {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .vlan-stat-lbl {
+            font-size: 0.62rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .vlan-desc {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 14px;
+        }
+
+        .vlan-card-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 0 -18px 14px;
+        }
+
+        .device-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .device-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .device-pill {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--bg-deep);
+            border: 1px solid var(--border-light);
+            padding: 3px 9px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+        }
+
+        /* ─── MODAL ─── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            z-index: 999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 620px;
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+            animation: modalIn 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            position: sticky;
+            top: 0;
+            background: var(--bg-secondary);
+            z-index: 1;
+        }
+
+        .modal-close {
+            margin-left: auto;
+            background: var(--bg-card);
+            border: none;
+            color: var(--text-muted);
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover { background: #ef4444; color: #fff; }
+
+        .modal-body { padding: 24px; }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .info-box {
+            background: var(--bg-deep);
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .info-box-label {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .info-box-val {
+            font-size: 0.88rem;
+            font-weight: 600;
+            font-family: monospace;
+        }
+
+        .device-list-modal {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            max-height: 260px;
+            overflow-y: auto;
+        }
+
+        .device-row-modal {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: var(--bg-deep);
+            border-radius: 9px;
+            border: 1px solid var(--border);
+        }
+
+        /* ─── MAP MODAL ─── */
+        .map-modal {
+            max-width: 95vw;
+            width: 95vw;
+        }
+
+        /* ─── BUTTONS ─── */
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-primary { background: var(--accent); color: #fff; }
+        .btn-primary:hover { background: #2d4ae0; }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border-light);
+        }
+
+        .btn-ghost:hover { background: var(--bg-card); color: var(--text-primary); }
+
+        /* ─── SCROLLBAR ─── */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 10px; }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 900px) {
+            .layout { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+        }
+
+        @media (max-width: 600px) {
+            .header { padding: 0 16px; }
+            .content { padding: 16px; }
+            .stats-bar { padding: 12px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<header class="header">
+    <div class="header-left">
+        <div class="header-logo">🌐</div>
+        <div class="header-title">
+            <h1>Network Infrastructure Dashboard</h1>
+            <p>VLAN Management System • Multi-Department Network</p>
+        </div>
+    </div>
+    <div class="header-right">
+        <div class="header-time" id="clockDisplay">--:--:--</div>
+        <div class="live-badge">
+            <div class="live-dot"></div>
+            <span class="live-text">LIVE</span>
+        </div>
+    </div>
+</header>
+
+<!-- ═══════════════ STATS BAR ═══════════════ -->
+<div class="stats-bar" id="statsBar"></div>
+
+<!-- ═══════════════ LAYOUT ═══════════════ -->
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-section-title">📋 VLAN ทั้งหมด</div>
+        <div id="sidebarList"></div>
+
+        <div class="sidebar-divider"></div>
+
+        <div class="sidebar-section-title">📊 สรุป</div>
+        <div id="sidebarSummary" style="padding:0 4px;display:flex;flex-direction:column;gap:8px;"></div>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="content">
+
+        <!-- TAB BAR — 2 tabs only -->
+        <div class="tab-bar">
+            <button class="tab-btn active" id="tabBtnOverview" onclick="switchTab('overview',this)">
+                📊 ภาพรวม
+            </button>
+            <button class="tab-btn" id="tabBtnVlans" onclick="switchTab('vlans',this)">
+                🔵 VLAN Details
+            </button>
+        </div>
+
+        <!-- ══ TAB: OVERVIEW ══ -->
+        <div class="tab-panel active" id="tab-overview">
+
+            <!-- Metrics -->
+            <div class="overview-metrics" id="overviewMetrics"></div>
+
+            <!-- Network Map -->
+            <div class="map-container">
+                <div class="section-header">
+                    <div class="section-title">🗺 Network Topology Diagram</div>
+                    <button class="btn btn-primary" onclick="openMapModal()">⛶ ขยายแผนที่</button>
+                </div>
+                <div class="map-img-wrapper" onclick="openMapModal()">
+                    <img src="NetworkTopology.png" alt="Network Topology">
+                    <div class="map-controls">
+                        <button class="map-ctrl-btn" onclick="openMapModal()" title="ขยาย">⛶</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick VLAN Overview -->
+            <div class="section-header">
+                <div class="section-title">⚡ VLAN ทั้งหมดในระบบ</div>
+                <span style="font-size:0.8rem;color:var(--text-muted);" id="vlanCountLabel"></span>
+            </div>
+            <div class="quick-vlan-list" id="quickVlanList"></div>
+
+        </div>
+
+        <!-- ══ TAB: VLAN DETAILS ══ -->
+        <div class="tab-panel" id="tab-vlans">
+            <input
+                type="text"
+                class="search-bar"
+                placeholder="🔍  ค้นหา VLAN, ชื่อแผนก, Subnet, ประเภท..."
+                oninput="filterVlans(this.value)"
+            >
+            <div class="vlan-grid" id="vlanGrid"></div>
+        </div>
+
+    </main>
+</div>
+
+<!-- ═══════════════ MODAL: VLAN DETAIL ═══════════════ -->
+<div class="modal-overlay" id="vlanModal" onclick="handleOverlayClick(event,'vlanModal')">
+    <div class="modal">
+        <div class="modal-header" id="vlanModalHeader">
+            <button class="modal-close" onclick="closeModal('vlanModal')">✕</button>
+        </div>
+        <div class="modal-body" id="vlanModalBody"></div>
+    </div>
+</div>
+
+<!-- ═══════════════ MODAL: MAP FULLSCREEN ═══════════════ -->
+<div class="modal-overlay" id="mapModal" onclick="closeModal('mapModal')">
+    <div class="modal map-modal">
+        <div class="modal-header">
+            <span class="section-title">🗺 Network Topology — Full View</span>
+            <button class="modal-close" onclick="closeModal('mapModal')">✕</button>
+        </div>
+        <div style="padding:20px;">
+            <div style="
+                background:var(--bg-deep);border-radius:12px;
+                min-height:70vh;display:flex;align-items:center;justify-content:center;
+            ">
+                <img src="NetworkTopology.png" style="width:100%;height:auto;border-radius:10px;" alt="Network Topology">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════ -->
+<script>
+
+// ══════════════════════════════════════════════════
+//  DATA  —  แก้ไขตามระบบจริงของคุณ
+// ══════════════════════════════════════════════════
+const VLANS = [
+    {
+        id: 10,
+        name: "Manager",
+        color: "#06b6d4",
+        bg: "rgba(6,182,212,0.12)",
+        emoji: "👔",
+        type: "Management",
+        subnet: "192.168.10.0/24",
+        gateway: "192.168.10.1",
+        bandwidth: "1 Gbps",
+        accessLevel: "Full Access",
+        desc: "VLAN สำหรับผู้บริหารและระดับจัดการ มีสิทธิ์เข้าถึงระบบทั้งหมด ควบคุมการทำงานของทุกแผนก",
+        deviceCount: 8,
+        devices: [
+            { name: "MGR-SW-01", type: "switch" },
+            { name: "MGR-PC-01", type: "computer" },
+            { name: "MGR-PC-02", type: "computer" },
+            { name: "MGR-Laptop-01", type: "computer" },
+            { name: "MGR-Printer", type: "printer" },
+        ]
+    },
+    {
+        id: 20,
+        name: "Accounting",
+        color: "#22c55e",
+        bg: "rgba(34,197,94,0.12)",
+        emoji: "📊",
+        type: "Finance",
+        subnet: "192.168.20.0/24",
+        gateway: "192.168.20.1",
+        bandwidth: "1 Gbps",
+        accessLevel: "Finance Access",
+        desc: "VLAN ฝ่ายบัญชี จัดการข้อมูลทางการเงิน รายได้-รายจ่าย ประสานงานกับแผนกจัดซื้อและแคชเชียร์",
+        deviceCount: 10,
+        devices: [
+            { name: "ACC-SW-01", type: "switch" },
+            { name: "ACC-PC-01", type: "computer" },
+            { name: "ACC-PC-02", type: "computer" },
+            { name: "ACC-PC-03", type: "computer" },
+            { name: "ACC-Printer-01", type: "printer" },
+        ]
+    },
+    {
+        id: 30,
+        name: "Purchasing",
+        color: "#f97316",
+        bg: "rgba(249,115,22,0.12)",
+        emoji: "🛒",
+        type: "Operations",
+        subnet: "192.168.30.0/24",
+        gateway: "192.168.30.1",
+        bandwidth: "100 Mbps",
+        accessLevel: "Operations Access",
+        desc: "VLAN ฝ่ายจัดซื้อ ดูแลการสั่งซื้อวัตถุดิบและสินค้า ติดต่อ Supplier และจัดการสต็อก",
+        deviceCount: 7,
+        devices: [
+            { name: "PUR-SW-01", type: "switch" },
+            { name: "PUR-PC-01", type: "computer" },
+            { name: "PUR-PC-02", type: "computer" },
+            { name: "PUR-Printer", type: "printer" },
+        ]
+    },
+    {
+        id: 40,
+        name: "Server Room",
+        color: "#ef4444",
+        bg: "rgba(239,68,68,0.12)",
+        emoji: "🖥️",
+        type: "Infrastructure",
+        subnet: "192.168.40.0/24",
+        gateway: "192.168.40.1",
+        bandwidth: "10 Gbps",
+        accessLevel: "Restricted",
+        desc: "VLAN ห้อง Server หลักขององค์กร มีการควบคุมการเข้าถึงอย่างเข้มงวด ให้บริการระบบทั้งหมด",
+        deviceCount: 12,
+        devices: [
+            { name: "SRV-Core-01", type: "server" },
+            { name: "SRV-DB-01", type: "server" },
+            { name: "SRV-Web-01", type: "server" },
+            { name: "SRV-Backup-01", type: "server" },
+            { name: "SRV-File-01", type: "server" },
+        ]
+    },
+    {
+        id: 50,
+        name: "Waiter",
+        color: "#eab308",
+        bg: "rgba(234,179,8,0.12)",
+        emoji: "🍽️",
+        type: "Service",
+        subnet: "192.168.50.0/24",
+        gateway: "192.168.50.1",
+        bandwidth: "100 Mbps",
+        accessLevel: "Limited Access",
+        desc: "VLAN สำหรับพนักงานเสิร์ฟ รับคำสั่งอาหารผ่าน Tablet/Handheld และส่งคำสั่งไปยังห้องครัว",
+        deviceCount: 15,
+        devices: [
+            { name: "WTR-SW-01", type: "switch" },
+            { name: "WTR-Tablet-01", type: "computer" },
+            { name: "WTR-Tablet-02", type: "computer" },
+            { name: "WTR-Tablet-03", type: "computer" },
+            { name: "WTR-Tablet-04", type: "computer" },
+        ]
+    },
+    {
+        id: 60,
+        name: "Cashier",
+        color: "#ec4899",
+        bg: "rgba(236,72,153,0.12)",
+        emoji: "💳",
+        type: "Point of Sale",
+        subnet: "192.168.60.0/24",
+        gateway: "192.168.60.1",
+        bandwidth: "100 Mbps",
+        accessLevel: "POS Access",
+        desc: "VLAN แคชเชียร์ ระบบชำระเงิน POS เชื่อมต่อกับระบบบัญชี ออกใบเสร็จและรับชำระเงิน",
+        deviceCount: 9,
+        devices: [
+            { name: "CSH-SW-01", type: "switch" },
+            { name: "CSH-POS-01", type: "computer" },
+            { name: "CSH-POS-02", type: "computer" },
+            { name: "CSH-Printer-01", type: "printer" },
+            { name: "CSH-Scanner-01", type: "computer" },
+        ]
+    },
+    {
+        id: 80,
+        name: "Staff",
+        color: "#8b5cf6",
+        bg: "rgba(139,92,246,0.12)",
+        emoji: "👥",
+        type: "General Staff",
+        subnet: "192.168.80.0/24",
+        gateway: "192.168.80.1",
+        bandwidth: "100 Mbps",
+        accessLevel: "Staff Access",
+        desc: "VLAN พนักงานทั่วไป ใช้งานอินเทอร์เน็ตและระบบภายในองค์กร สำหรับงาน Day-to-Day",
+        deviceCount: 20,
+        devices: [
+            { name: "STF-SW-01", type: "switch" },
+            { name: "STF-PC-01", type: "computer" },
+            { name: "STF-PC-02", type: "computer" },
+            { name: "STF-PC-03", type: "computer" },
+            { name: "STF-PC-04", type: "computer" },
+        ]
+    },
+    {
+        id: 90,
+        name: "IP Phone",
+        color: "#fb923c",
+        bg: "rgba(251,146,60,0.12)",
+        emoji: "📞",
+        type: "VoIP",
+        subnet: "192.168.90.0/24",
+        gateway: "192.168.90.1",
+        bandwidth: "100 Mbps",
+        accessLevel: "VoIP Only",
+        desc: "VLAN ระบบโทรศัพท์ IP (VoIP) สื่อสารภายในองค์กร แยก Traffic เสียงออกจากข้อมูลทั่วไป",
+        deviceCount: 18,
+        devices: [
+            { name: "VOIP-SW-01", type: "switch" },
+            { name: "IPPhone-Lobby", type: "phone" },
+            { name: "IPPhone-MGR", type: "phone" },
+            { name: "IPPhone-ACC", type: "phone" },
+            { name: "IPPhone-KIT", type: "phone" },
+        ]
+    },
+    {
+        id: 110,
+        name: "Kitchen",
+        color: "#d97706",
+        bg: "rgba(217,119,6,0.12)",
+        emoji: "🍳",
+        type: "Operations",
+        subnet: "192.168.110.0/24",
+        gateway: "192.168.110.1",
+        bandwidth: "100 Mbps",
+        accessLevel: "Kitchen Access",
+        desc: "VLAN ห้องครัว รับคำสั่งอาหารจากพนักงานเสิร์ฟ แสดงผลบนหน้าจอ KDS และพิมพ์ใบคำสั่ง",
+        deviceCount: 6,
+        devices: [
+            { name: "KIT-SW-01", type: "switch" },
+            { name: "KIT-KDS-01", type: "computer" },
+            { name: "KIT-KDS-02", type: "computer" },
+            { name: "KIT-Printer-01", type: "printer" },
+        ]
+    },
+];
+
+const DEVICE_ICONS = {
+    switch: "🔌", router: "📡", computer: "💻",
+    server: "🖥️", phone: "📞", printer: "🖨️",
+    camera: "📷", ap: "📶"
+};
+
+// ══════════════════════════════════════════════════
+//  TAB SWITCH
+// ══════════════════════════════════════════════════
+function switchTab(name, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    btn.classList.add('active');
+}
+
+// ══════════════════════════════════════════════════
+//  STATS BAR
+// ══════════════════════════════════════════════════
+function renderStats() {
+    const total = VLANS.reduce((s, v) => s + v.deviceCount, 0);
+    const items = [
+        { icon: "🏢", val: VLANS.length,   label: "VLAN ทั้งหมด" },
+        { icon: "💻", val: total,           label: "อุปกรณ์รวม" },
+        { icon: "🖥️", val: 5,              label: "Servers" },
+        { icon: "📞", val: 18,             label: "IP Phones" },
+        { icon: "✅", val: "NORMAL",       label: "System Status", color: "#00ff88" },
+    ];
+    document.getElementById('statsBar').innerHTML = items.map(s => `
+        <div class="stat-card">
+            <span class="stat-icon">${s.icon}</span>
+            <div>
+                <div class="stat-value" style="${s.color ? 'color:'+s.color : ''}">${s.val}</div>
+                <div class="stat-label">${s.label}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ══════════════════════════════════════════════════
+//  SIDEBAR
+// ══════════════════════════════════════════════════
+function renderSidebar() {
+    document.getElementById('sidebarList').innerHTML = VLANS.map(v => `
+        <div class="vlan-nav-item" onclick="openVlanModal(${v.id})">
+            <div class="vlan-dot" style="background:${v.color};box-shadow:0 0 6px ${v.color}66;"></div>
+            <div class="vlan-nav-label">
+                <div class="vlan-nav-name">${v.name}</div>
+                <div class="vlan-nav-id">VLAN ${v.id}</div>
+            </div>
+            <span class="vlan-nav-count" style="background:${v.bg};color:${v.color};">
+                ${v.deviceCount}
+            </span>
+        </div>
+    `).join('');
+
+    const total = VLANS.reduce((s, v) => s + v.deviceCount, 0);
+    document.getElementById('sidebarSummary').innerHTML = `
+        <div style="background:var(--bg-deep);border-radius:8px;padding:10px 12px;">
+            <div style="font-size:0.68rem;color:var(--text-muted);">อุปกรณ์ทั้งหมด</div>
+            <div style="font-size:1.3rem;font-weight:800;color:#fff;">${total}
+                <span style="font-size:0.72rem;color:var(--text-muted);font-weight:400;">เครื่อง</span>
+            </div>
+        </div>
+        <div style="background:var(--bg-deep);border-radius:8px;padding:10px 12px;">
+            <div style="font-size:0.68rem;color:var(--text-muted);">VLAN ทั้งหมด</div>
+            <div style="font-size:1.3rem;font-weight:800;color:#fff;">${VLANS.length}
+                <span style="font-size:0.72rem;color:var(--text-muted);font-weight:400;">Zone</span>
+            </div>
+        </div>
+    `;
+}
+
+// ══════════════════════════════════════════════════
+//  OVERVIEW TAB
+// ══════════════════════════════════════════════════
+function renderOverview() {
+    const total = VLANS.reduce((s, v) => s + v.deviceCount, 0);
+
+    // Metrics
+    document.getElementById('overviewMetrics').innerHTML = [
+        { icon:"🏢", val: VLANS.length, label:"VLAN Zones",      color:"#3d5af1" },
+        { icon:"💻", val: total,         label:"อุปกรณ์ทั้งหมด", color:"#22c55e" },
+        { icon:"🖥️", val: 5,            label:"Servers",         color:"#ef4444" },
+        { icon:"📞", val: 18,           label:"IP Phones",       color:"#fb923c" },
+        { icon:"🔗", val: 11,           label:"Network Links",   color:"#8b5cf6" },
+        { icon:"✅", val:"100%",        label:"Uptime",          color:"#00ff88" },
+    ].map(m => `
+        <div class="metric-card">
+            <div class="metric-icon">${m.icon}</div>
+            <div class="metric-value" style="color:${m.color};">${m.val}</div>
+            <div class="metric-label">${m.label}</div>
+        </div>
+    `).join('');
+
+    // Map VLAN badges
+    document.getElementById('mapBadges').innerHTML = VLANS.map(v => `
+        <span style="
+            background:${v.bg};color:${v.color};
+            padding:4px 10px;border-radius:12px;
+            font-size:0.7rem;font-weight:700;
+        ">${v.emoji} VLAN ${v.id}</span>
+    `).join('');
+
+    // Quick VLAN List
+    document.getElementById('vlanCountLabel').textContent = `${VLANS.length} VLAN`;
+    document.getElementById('quickVlanList').innerHTML = VLANS.map(v => `
+        <div class="quick-vlan-row"
+             style="border-left-color:${v.color};"
+             onclick="openVlanModal(${v.id})">
+            <span style="font-size:1.6rem;">${v.emoji}</span>
+            <div style="flex:1;">
+                <div style="font-size:0.88rem;font-weight:700;color:#fff;">
+                    VLAN ${v.id} — ${v.name}
+                </div>
+                <div style="font-size:0.7rem;color:var(--text-muted);font-family:monospace;">
+                    ${v.subnet} • ${v.type}
+                </div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;">
+                <div style="font-size:1.1rem;font-weight:800;color:${v.color};">
+                    ${v.deviceCount}
+                </div>
+                <div style="font-size:0.62rem;color:var(--text-muted);">Devices</div>
+            </div>
+            <span style="color:${v.color};font-size:0.9rem;margin-left:4px;">›</span>
+        </div>
+    `).join('');
+}
+
+// ══════════════════════════════════════════════════
+//  VLAN GRID (Details Tab)
+// ══════════════════════════════════════════════════
+function renderVlanGrid(list = VLANS) {
+    if(list.length === 0) {
+        document.getElementById('vlanGrid').innerHTML = `
+            <div style="
+                grid-column:1/-1;text-align:center;
+                padding:60px;color:var(--text-muted);
+            ">
+                <div style="font-size:3rem;margin-bottom:12px;opacity:0.3;">🔍</div>
+                <div>ไม่พบ VLAN ที่ค้นหา</div>
+            </div>`;
+        return;
+    }
+
+    document.getElementById('vlanGrid').innerHTML = list.map(v => `
+        <div class="vlan-card" onclick="openVlanModal(${v.id})">
+            <div class="vlan-card-top-bar" style="background:${v.color};"></div>
+            <div class="vlan-card-body">
+                <span class="vlan-badge" style="background:${v.bg};color:${v.color};">
+                    VLAN ${v.id}
+                </span>
+                <div class="vlan-card-header">
+                    <div class="vlan-emoji-box" style="background:${v.bg};">${v.emoji}</div>
+                    <div class="vlan-info">
+                        <h3>${v.name}</h3>
+                        <p>${v.subnet}</p>
+                        <p style="color:${v.color};font-size:0.7rem;margin-top:2px;">${v.type}</p>
+                    </div>
+                </div>
+                <div class="vlan-stats-row">
+                    <div class="vlan-stat-box">
+                        <div class="vlan-stat-val" style="color:${v.color};">${v.deviceCount}</div>
+                        <div class="vlan-stat-lbl">Devices</div>
+                    </div>
+                    <div class="vlan-stat-box">
+                        <div class="vlan-stat-val" style="color:#60a5fa;font-size:0.78rem;">${v.bandwidth}</div>
+                        <div class="vlan-stat-lbl">Bandwidth</div>
+                    </div>
+                    <div class="vlan-stat-box">
+                        <div class="vlan-stat-val" style="color:#00ff88;">✓</div>
+                        <div class="vlan-stat-lbl">Online</div>
+                    </div>
+                </div>
+                <p class="vlan-desc">${v.desc}</p>
+                <div class="vlan-card-divider"></div>
+                <div class="device-label">อุปกรณ์หลัก</div>
+                <div class="device-pills">
+                    ${v.devices.slice(0, 3).map(d => `
+                        <span class="device-pill">
+                            ${DEVICE_ICONS[d.type] || '📟'} ${d.name}
+                        </span>
+                    `).join('')}
+                    ${v.devices.length > 3 ? `
+                        <span class="device-pill" style="color:${v.color};">
+                            +${v.devices.length - 3}
+                        </span>
+                    ` : ''}
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ══════════════════════════════════════════════════
+//  FILTER
+// ══════════════════════════════════════════════════
+function filterVlans(q) {
+    const s = q.toLowerCase();
+    renderVlanGrid(VLANS.filter(v =>
+        v.name.toLowerCase().includes(s) ||
+        String(v.id).includes(s) ||
+        v.subnet.includes(s) ||
+        v.type.toLowerCase().includes(s) ||
+        v.desc.toLowerCase().includes(s)
+    ));
+}
+
+// ══════════════════════════════════════════════════
+//  MODAL — VLAN DETAIL
+// ══════════════════════════════════════════════════
+function openVlanModal(id) {
+    const v = VLANS.find(x => x.id === id);
+    if(!v) return;
+
+    document.getElementById('vlanModalHeader').innerHTML = `
+        <div style="
+            width:54px;height:54px;border-radius:14px;
+            background:${v.bg};display:flex;
+            align-items:center;justify-content:center;font-size:1.8rem;
+        ">${v.emoji}</div>
+        <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+                <span style="
+                    background:${v.bg};color:${v.color};
+                    padding:2px 10px;border-radius:10px;
+                    font-size:0.7rem;font-weight:700;font-family:monospace;
+                ">VLAN ${v.id}</span>
+                <span style="
+                    background:rgba(0,255,136,0.1);color:#00ff88;
+                    padding:2px 10px;border-radius:10px;font-size:0.7rem;
+                ">● Online</span>
+            </div>
+            <h2 style="color:#fff;font-size:1.25rem;font-weight:700;">${v.name}</h2>
+        </div>
+        <button class="modal-close" onclick="closeModal('vlanModal')">✕</button>
+    `;
+
+    document.getElementById('vlanModalBody').innerHTML = `
+        <p style="
+            color:var(--text-muted);font-size:0.82rem;
+            line-height:1.7;margin-bottom:20px;
+            padding:12px;background:var(--bg-deep);
+            border-radius:10px;border-left:3px solid ${v.color};
+        ">${v.desc}</p>
+
+        <div class="info-grid">
+            ${[
+                { label:"Subnet",       val: v.subnet,      color:"#60a5fa" },
+                { label:"Gateway",      val: v.gateway,     color:"#34d399" },
+                { label:"Type",         val: v.type,        color: v.color  },
+                { label:"Bandwidth",    val: v.bandwidth,   color:"#f59e0b" },
+                { label:"Access Level", val: v.accessLevel, color:"#a78bfa" },
+                { label:"Devices",      val: v.deviceCount + " เครื่อง", color:"#fff" },
+            ].map(i => `
+                <div class="info-box">
+                    <div class="info-box-label">${i.label}</div>
+                    <div class="info-box-val" style="color:${i.color};">${i.val}</div>
+                </div>
+            `).join('')}
+        </div>
+
+        <div style="
+            font-size:0.68rem;color:var(--text-muted);
+            text-transform:uppercase;letter-spacing:1px;
+            margin-bottom:10px;
+        ">อุปกรณ์ในระบบ (${v.devices.length} เครื่อง)</div>
+
+        <div class="device-list-modal">
+            ${v.devices.map(d => `
+                <div class="device-row-modal">
+                    <span style="font-size:1.2rem;">${DEVICE_ICONS[d.type] || '📟'}</span>
+                    <span style="flex:1;color:#e5e7eb;font-size:0.85rem;">${d.name}</span>
+                    <span style="
+                        font-size:0.7rem;padding:3px 10px;border-radius:10px;
+                        background:rgba(0,255,136,0.1);color:#00ff88;
+                    ">● Online</span>
+                </div>
+            `).join('')}
+        </div>
+    `;
+
+    document.getElementById('vlanModal').classList.add('show');
+}
+
+function openMapModal() {
+    document.getElementById('mapModal').classList.add('show');
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove('show');
+}
+
+function handleOverlayClick(e, id) {
+    if(e.target === document.getElementById(id)) closeModal(id);
+}
+
+// ══════════════════════════════════════════════════
+//  CLOCK
+// ══════════════════════════════════════════════════
+function updateClock() {
+    document.getElementById('clockDisplay').textContent =
+        new Date().toLocaleTimeString('th-TH');
+}
+
+// ══════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+    renderStats();
+    renderSidebar();
+    renderOverview();
+    renderVlanGrid();
+    updateClock();
+    setInterval(updateClock, 1000);
+});
+</script>
+
+</body>
+</html>
+
+							<script>
+                            	
+							</script>
+                        </body>
+                        </html>
+                    
