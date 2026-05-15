@@ -842,15 +842,19 @@
     <div class="modal map-modal">
         <div class="modal-header">
             <span class="section-title">🗺 Network Topology — Full View</span>
+            <div class="zoom-controls">
+                <button class="btn-zoom" onclick="zoomIn()" title="Zoom In">🔍+</button>
+                <button class="btn-zoom" onclick="zoomOut()" title="Zoom Out">🔍-</button>
+            </div>
             <button class="modal-close" onclick="closeModal('mapModal')">✕</button>
         </div>
         <div style="padding:20px;">
             <div style="
                 background:var(--bg-deep);border-radius:12px;
-                min-height:70vh;display:flex;align-items:center;justify-content:center;
+                min-height:70vh;display:flex;align-items:center;justify-content:center; overflow: auto;
             ">
-                <img src="NetworkTopology.png" style="width:100%;height:auto;border-radius:10px;" alt="Network Topology">
-            </div>
+                <img id="mapImage" src="NetworkTopology.png" style="width:100%;height:auto;border-radius:10px; transform-origin: center; transition: transform 0.3s;" alt="Network Topology">
+            </div>ฤ
         </div>
     </div>
 </div>
