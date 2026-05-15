@@ -716,6 +716,33 @@
             max-height: 85vh;
         }
 
+        .map-zoom-shell {
+            background: var(--bg-deep);
+            border-radius: 12px;
+            max-width: 80vw;
+            max-height: 74vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            cursor: grab;
+            touch-action: none;
+        }
+
+        .map-zoom-shell:active { cursor: grabbing; }
+
+        .map-zoom-shell img {
+            max-width: 78vw;
+            max-height: 72vh;
+            width: auto;
+            height: auto;
+            border-radius: 10px;
+            transform-origin: center;
+            transition: transform 0.2s;
+            user-select: none;
+            pointer-events: none;
+        }
+
         /* ─── BUTTONS ─── */
         .btn {
             padding: 8px 16px;
@@ -871,11 +898,8 @@
             <button class="modal-close" onclick="closeModal('mapModal')">✕</button>
         </div>
         <div style="padding:20px;">
-            <div style="
-                background:var(--bg-deep);border-radius:12px;
-                max-width:80vw;max-height:74vh;display:flex;align-items:center;justify-content:center;overflow:hidden;
-            ">
-                <img id="mapImage" src="NetworkTopology.png" style="max-width:78vw;max-height:72vh;width:auto;height:auto;border-radius:10px;transform-origin:center;transition:transform 0.3s;" alt="Network Topology">
+            <div id="mapZoomShell" class="map-zoom-shell">
+                <img id="mapImage" src="NetworkTopology.png" alt="Network Topology">
             </div>
         </div>
     </div>
@@ -1367,21 +1391,99 @@ function openVlanModal(id) {
 }
 
 var mapScale = 1;
+var mapTranslateX = 0;
+var mapTranslateY = 0;
+var isDragging = false;
+var dragStartX = 0;
+var dragStartY = 0;
+var startTranslateX = 0;
+var startTranslateY = 0;
+
+function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+}
+
+function updateImageTransform() {
+    const img = document.getElementById('mapImage');
+    img.style.transform = `translate(${mapTranslateX}px, ${mapTranslateY}px) scale(${mapScale})`;
+}
+
+function getPanLimits() {
+    const shell = document.getElementById('mapZoomShell');
+    const img = document.getElementById('mapImage');
+    const shellRect = shell.getBoundingClientRect();
+    const imgWidth = img.naturalWidth * mapScale;
+    const imgHeight = img.naturalHeight * mapScale;
+    const maxX = Math.max(0, (imgWidth - shellRect.width) / 2);
+    const maxY = Math.max(0, (imgHeight - shellRect.height) / 2);
+    return { maxX, maxY };
+}
 
 function openMapModal() {
     document.getElementById('mapModal').classList.add('show');
     mapScale = 1;
-    document.getElementById('mapImage').style.transform = 'scale(1)';
+    mapTranslateX = 0;
+    mapTranslateY = 0;
+    updateImageTransform();
 }
 
 function zoomIn() {
-    mapScale += 0.2;
-    document.getElementById('mapImage').style.transform = 'scale(' + mapScale + ')';
+    mapScale = Math.min(mapScale + 0.2, 3);
+    const limits = getPanLimits();
+    mapTranslateX = clamp(mapTranslateX, -limits.maxX, limits.maxX);
+    mapTranslateY = clamp(mapTranslateY, -limits.maxY, limits.maxY);
+    updateImageTransform();
 }
 
 function zoomOut() {
-    if (mapScale > 0.2) mapScale -= 0.2;
-    document.getElementById('mapImage').style.transform = 'scale(' + mapScale + ')';
+    mapScale = Math.max(mapScale - 0.2, 1);
+    const limits = getPanLimits();
+    mapTranslateX = clamp(mapTranslateX, -limits.maxX, limits.maxX);
+    mapTranslateY = clamp(mapTranslateY, -limits.maxY, limits.maxY);
+    updateImageTransform();
+}
+
+function onMapPointerDown(event) {
+    if (mapScale <= 1) return;
+    isDragging = true;
+    dragStartX = event.clientX;
+    dragStartY = event.clientY;
+    startTranslateX = mapTranslateX;
+    startTranslateY = mapTranslateY;
+    document.body.style.cursor = 'grabbing';
+}
+
+function onMapPointerMove(event) {
+    if (!isDragging) return;
+    const deltaX = event.clientX - dragStartX;
+    const deltaY = event.clientY - dragStartY;
+    const limits = getPanLimits();
+    mapTranslateX = clamp(startTranslateX + deltaX, -limits.maxX, limits.maxX);
+    mapTranslateY = clamp(startTranslateY + deltaY, -limits.maxY, limits.maxY);
+    updateImageTransform();
+}
+
+function onMapPointerUp() {
+    if (!isDragging) return;
+    isDragging = false;
+    document.body.style.cursor = '';
+}
+
+function onMapWheel(event) {
+    event.preventDefault();
+    if (event.deltaY < 0) zoomIn();
+    else zoomOut();
+}
+
+function initMapInteractions() {
+    const shell = document.getElementById('mapZoomShell');
+    if (!shell) return;
+    shell.addEventListener('mousedown', onMapPointerDown);
+    shell.addEventListener('mousemove', onMapPointerMove);
+    shell.addEventListener('mouseup', onMapPointerUp);
+    shell.addEventListener('mouseleave', onMapPointerUp);
+    shell.addEventListener('wheel', onMapWheel, { passive: false });
+    document.addEventListener('mouseup', onMapPointerUp);
 }
 
 function closeModal(id) {
@@ -1410,6 +1512,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderVlanGrid();
     updateClock();
     setInterval(updateClock, 1000);
+    initMapInteractions();
 });
 </script>
 
