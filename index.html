@@ -887,8 +887,8 @@
 </div>
 
 <!-- ═══════════════ MODAL: MAP FULLSCREEN ═══════════════ -->
-<div class="modal-overlay" id="mapModal" onclick="closeModal('mapModal')">
-    <div class="modal map-modal">
+<div class="modal-overlay" id="mapModal" onclick="handleOverlayClick(event,'mapModal')">
+    <div class="modal map-modal" onclick="event.stopPropagation()">
         <div class="modal-header">
             <span class="section-title">🗺 Network Topology — Full View</span>
             <div class="zoom-controls">
