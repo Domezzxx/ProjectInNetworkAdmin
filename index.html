@@ -1412,8 +1412,8 @@ function getPanLimits() {
     const shell = document.getElementById('mapZoomShell');
     const img = document.getElementById('mapImage');
     const shellRect = shell.getBoundingClientRect();
-    const imgWidth = img.naturalWidth * mapScale;
-    const imgHeight = img.naturalHeight * mapScale;
+    const imgWidth = img.width * mapScale;
+    const imgHeight = img.height * mapScale;
     const maxX = Math.max(0, (imgWidth - shellRect.width) / 2);
     const maxY = Math.max(0, (imgHeight - shellRect.height) / 2);
     return { maxX, maxY };
@@ -1445,6 +1445,8 @@ function zoomOut() {
 
 function onMapPointerDown(event) {
     if (mapScale <= 1) return;
+    event.preventDefault();
+    event.stopPropagation();
     isDragging = true;
     dragStartX = event.clientX;
     dragStartY = event.clientY;
@@ -1455,6 +1457,7 @@ function onMapPointerDown(event) {
 
 function onMapPointerMove(event) {
     if (!isDragging) return;
+    event.preventDefault();
     const deltaX = event.clientX - dragStartX;
     const deltaY = event.clientY - dragStartY;
     const limits = getPanLimits();
@@ -1479,10 +1482,8 @@ function initMapInteractions() {
     const shell = document.getElementById('mapZoomShell');
     if (!shell) return;
     shell.addEventListener('mousedown', onMapPointerDown);
-    shell.addEventListener('mousemove', onMapPointerMove);
-    shell.addEventListener('mouseup', onMapPointerUp);
-    shell.addEventListener('mouseleave', onMapPointerUp);
     shell.addEventListener('wheel', onMapWheel, { passive: false });
+    document.addEventListener('mousemove', onMapPointerMove);
     document.addEventListener('mouseup', onMapPointerUp);
 }
 
