@@ -1,18 +1,8 @@
 
 
-                        <head>
-                            <meta charset="UTF-8">
-                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-							<style>
-								body {
-									background-color: white; /* Ensure the iframe has a white background */
-								}
-
+							
 								
-							</style>
-                        </head>
-                        <body>
-                            <!DOCTYPE html>
+			<!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
@@ -1447,14 +1437,16 @@ function zoomOut() {
 function onMapPointerDown(event) {
     if (mapScale <= 1) return;
     event.preventDefault();
+    event.stopPropagation();
     isDragging = true;
     activePointerId = event.pointerId;
     dragStartX = event.clientX;
     dragStartY = event.clientY;
     startTranslateX = mapTranslateX;
     startTranslateY = mapTranslateY;
-    if (event.currentTarget && event.currentTarget.setPointerCapture) {
-        event.currentTarget.setPointerCapture(activePointerId);
+    const shell = document.getElementById('mapZoomShell');
+    if (shell && shell.setPointerCapture) {
+        shell.setPointerCapture(activePointerId);
     }
     document.body.style.cursor = 'grabbing';
 }
@@ -1471,11 +1463,13 @@ function onMapPointerMove(event) {
 }
 
 function onMapPointerUp(event) {
-    if (!isDragging || (event && event.pointerId !== activePointerId)) return;
+    if (!isDragging) return;
+    if (event && event.pointerId !== activePointerId) return;
     isDragging = false;
     activePointerId = null;
-    if (event && event.currentTarget && event.currentTarget.releasePointerCapture) {
-        event.currentTarget.releasePointerCapture(event.pointerId);
+    const shell = document.getElementById('mapZoomShell');
+    if (shell && shell.releasePointerCapture) {
+        shell.releasePointerCapture(event.pointerId);
     }
     document.body.style.cursor = '';
 }
@@ -1492,11 +1486,11 @@ function initMapInteractions() {
     shell.addEventListener('pointerdown', onMapPointerDown);
     shell.addEventListener('pointermove', onMapPointerMove);
     shell.addEventListener('pointerup', onMapPointerUp);
-    shell.addEventListener('pointerleave', onMapPointerUp);
     shell.addEventListener('pointercancel', onMapPointerUp);
     shell.addEventListener('wheel', onMapWheel, { passive: false });
     document.addEventListener('pointermove', onMapPointerMove);
     document.addEventListener('pointerup', onMapPointerUp);
+    document.addEventListener('pointercancel', onMapPointerUp);
 }
 
 function closeModal(id) {
